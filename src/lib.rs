@@ -73,13 +73,13 @@
 #[macro_export]
 macro_rules! matrix {
     ($t:ty; $n:expr) => {
-        $crate::matrix::Matrix::<$t, { $n }, { $n }>::id()
+        $crate::core::Matrix::<$t, { $n }, { $n }>::id()
     };
     ($val:expr; $rows:expr, $cols:expr) => {
-        $crate::matrix::Matrix::<_,  { $rows },  { $cols }>::from_val($val)
+        $crate::core::Matrix::<_,  { $rows },  { $cols }>::from_val($val)
     };
     ($($($elem:expr),+);+$(;)?) => {
-        $crate::matrix::Matrix::from_array([$([$($elem),*]),*])
+        $crate::core::Matrix::from_array([$([$($elem),*]),*])
     };
 }
 
@@ -121,18 +121,19 @@ macro_rules! matrix {
 #[macro_export]
 macro_rules! vector {
     ($val:expr; $dim:expr) => {
-        $crate::Vector::<_, { $dim }>::from_val($val)
+        $crate::core::Vector::<_, { $dim }>::from_val($val)
     };
     ($($elem:expr),+$(,)?) => {
-        $crate::Vector::from_array([[$($elem),*]])
+        $crate::core::Vector::from_array([[$($elem),*]])
     };
 }
 
-pub mod matrix;
+pub mod core;
+pub mod geometry;
 pub mod traits;
 pub(crate) mod utils;
 
 pub use crate::{
-    matrix::*,
-    traits::{Real as __Real, Scalar as __Scalar},
+    core::*,
+    traits::{Real as _, Scalar as _},
 };

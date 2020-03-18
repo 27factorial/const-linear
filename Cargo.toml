@@ -1,0 +1,15 @@
+[package]
+name = "const-linear"
+version = "0.1.0"
+authors = ["Factorial <27factorial@gmail.com>"]
+edition = "2018"
+
+categories = ["algorithms", "mathematics", "game-development", "science"]
+description = "A Rust linear algebra library based on const generics."
+license = "MIT"
+readme = "README.MD"
+repository = "https://www.github.com/27factorial/const-linear.git"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]

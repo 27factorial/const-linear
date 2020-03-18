@@ -133,7 +133,4 @@ pub mod geometry;
 pub mod traits;
 pub(crate) mod utils;
 
-pub use crate::{
-    core::*,
-    traits::{Real as _, Scalar as _},
-};
+pub use crate::{core::*, traits::*};

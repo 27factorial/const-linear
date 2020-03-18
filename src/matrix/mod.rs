@@ -1166,6 +1166,17 @@ pub type VectorF64<const N: usize> = Vector<f64, { N }>;
 pub type VectorF32<const N: usize> = Vector<f32, { N }>;
 
 impl<T: Scalar, const N: usize> Vector<T, { N }> {
+    pub const fn basis(dim: usize) -> Option<Self> {
+        if dim >= N {
+            None
+        } else {
+            let mut v = Self::zero();
+            v.as_mut_array()[0][dim] = T::ONE;
+
+            Some(v)
+        }
+    }
+
     /// Returns the length of the vector as an [`f64`].
     ///
     /// # Examples
@@ -1541,6 +1552,12 @@ mod tests {
         let expected = vector![18, -6, -12];
 
         assert!(v.cross(&w) == expected);
+    }
+
+    #[test]
+    fn vector_basis() {
+        assert_eq!(Vector::<usize, 1>::basis(1), None);
+        assert_eq!(Vector::<usize, 3>::basis(1), Some(vector![0, 1, 0]));
     }
 
     #[test]

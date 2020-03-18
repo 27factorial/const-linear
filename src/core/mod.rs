@@ -1335,6 +1335,7 @@ impl<T: Scalar, const N: usize> Div<T> for Vector<T, { N }> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::{matrix, vector};
     use std::time::Instant;
 
     #[test]

@@ -94,6 +94,8 @@ pub trait Real: Scalar + sealed::Ops<Self> {
     /// `log(e)`
     fn log10_e() -> Self;
 
+    fn from_scalar<T: Scalar>(t: T) -> Self;
+
     /// Tests for approximate equality between two real numbers. This is a
     /// workaround for the limited precision of floating point numbers.
     ///
@@ -130,7 +132,7 @@ macro_rules! scalar_impls {
             // Unfortunately, it's not possible to do a blanket impl, so this is a workaround
             // for all types which impl Scalar. Inverse of impl Mul<T> for Matrix<T>
             impl<const M: usize, const N: usize> ::std::ops::Mul<$crate::Matrix<$t, { M }, { N }>> for $t {
-                type Output = $crate::Matrix<$t, { M }, { N }>;
+                type Output = $crate::core::Matrix<$t, { M }, { N }>;
 
                 fn mul(self, mut rhs: Self::Output) -> Self::Output {
                     for elem in rhs.column_iter_mut() {
@@ -147,94 +149,18 @@ macro_rules! scalar_impls {
 macro_rules! real_impls {
     ($($t:ident),+) => {
         $(
-            impl Real for $t {
-                fn e() -> Self {
-                    ::std::$t::consts::E
-                }
+            impl ::std::ops::Mul<$crate::geometry::angle::Angle<$t>> for $t {
+                type Output = $crate::geometry::angle::Angle<$t>;
 
-                fn sqrt_2() -> Self {
-                    ::std::$t::consts::SQRT_2
-                }
-
-                fn pi() -> Self {
-                    ::std::$t::consts::PI
-                }
-
-                fn one_over_pi() -> Self {
-                    ::std::$t::consts::FRAC_1_PI
-                }
-
-                fn two_over_pi() -> Self {
-                    ::std::$t::consts::FRAC_2_PI
-                }
-
-                fn two_over_sqrt_pi() -> Self {
-                    ::std::$t::consts::FRAC_2_SQRT_PI
-                }
-
-                fn one_over_sqrt_two() -> Self {
-                    ::std::$t::consts::FRAC_1_SQRT_2
-                }
-
-                fn pi_over_2() -> Self {
-                    ::std::$t::consts::FRAC_PI_2
-                }
-
-                fn pi_over_3() -> Self {
-                    ::std::$t::consts::FRAC_PI_3
-                }
-
-                fn pi_over_4() -> Self {
-                    ::std::$t::consts::FRAC_PI_4
-                }
-
-                fn pi_over_6() -> Self {
-                    ::std::$t::consts::FRAC_PI_6
-                }
-
-                fn pi_over_8() -> Self {
-                    ::std::$t::consts::FRAC_PI_8
-                }
-
-                fn ln_2() -> Self {
-                    ::std::$t::consts::LN_2
-                }
-
-                fn ln_10() -> Self {
-                    ::std::$t::consts::LN_10
-                }
-
-                fn log2_e() -> Self {
-                    ::std::$t::consts::LOG2_E
-                }
-
-                fn log10_e() -> Self {
-                    ::std::$t::consts::LOG10_E
-                }
-
-                // Adapted from the relative_eq method in the approx crate.
-                // https://docs.rs/approx/0.3.2/src/approx/relative_eq.rs.html#54-83
-                fn approx_eq(self, other: Self, epsilon: Self, max_relative: Self) -> bool {
-                    // The special case in which both are *exactly* equal.
-                    if self == other {
-                        return true;
-                    } else if self.is_infinite() || other.is_infinite()
-                        || self.is_nan() || other.is_nan()
-                    {
-                        return false;
-                    }
-
-                    let diff = (self - other).abs();
-
-                    if diff <= epsilon {
-                        true
-                    } else {
-                        let abs_self = self.abs();
-                        let abs_other = other.abs();
-
-                        let largest = Self::max(abs_self, abs_other);
-
-                        diff < largest * max_relative
+                fn mul(
+                    self,
+                    rhs: $crate::geometry::angle::Angle<$t>
+                ) -> $crate::geometry::angle::Angle<$t> {
+                    match rhs {
+                        $crate::geometry::angle::Angle::Deg(_) =>
+                            $crate::geometry::angle::Angle::Deg(rhs.val() * self),
+                        $crate::geometry::angle::Angle::Rad(_) =>
+                            $crate::geometry::angle::Angle::Rad(rhs.val() * self),
                     }
                 }
             }
@@ -259,9 +185,197 @@ scalar_impls! {
     f64, 0.0, 1.0
 }
 
+impl Real for f64 {
+    fn e() -> Self {
+        std::f64::consts::E
+    }
+
+    fn sqrt_2() -> Self {
+        std::f64::consts::SQRT_2
+    }
+
+    fn pi() -> Self {
+        std::f64::consts::PI
+    }
+
+    fn one_over_pi() -> Self {
+        std::f64::consts::FRAC_1_PI
+    }
+
+    fn two_over_pi() -> Self {
+        std::f64::consts::FRAC_2_PI
+    }
+
+    fn two_over_sqrt_pi() -> Self {
+        std::f64::consts::FRAC_2_SQRT_PI
+    }
+
+    fn one_over_sqrt_two() -> Self {
+        std::f64::consts::FRAC_1_SQRT_2
+    }
+
+    fn pi_over_2() -> Self {
+        std::f64::consts::FRAC_PI_2
+    }
+
+    fn pi_over_3() -> Self {
+        std::f64::consts::FRAC_PI_3
+    }
+
+    fn pi_over_4() -> Self {
+        std::f64::consts::FRAC_PI_4
+    }
+
+    fn pi_over_6() -> Self {
+        std::f64::consts::FRAC_PI_6
+    }
+
+    fn pi_over_8() -> Self {
+        std::f64::consts::FRAC_PI_8
+    }
+
+    fn ln_2() -> Self {
+        std::f64::consts::LN_2
+    }
+
+    fn ln_10() -> Self {
+        std::f64::consts::LN_10
+    }
+
+    fn log2_e() -> Self {
+        std::f64::consts::LOG2_E
+    }
+
+    fn log10_e() -> Self {
+        std::f64::consts::LOG10_E
+    }
+
+    fn from_scalar<T: Scalar>(t: T) -> Self {
+        t.to_f64()
+    }
+
+    // Adapted from the relative_eq method in the approx crate.
+    // https://docs.rs/approx/0.3.2/src/approx/relative_eq.rs.html#54-83
+    fn approx_eq(self, other: Self, epsilon: Self, max_relative: Self) -> bool {
+        // The special case in which both are *exactly* equal.
+        if self == other {
+            return true;
+        } else if self.is_infinite() || other.is_infinite() || self.is_nan() || other.is_nan() {
+            return false;
+        }
+
+        let diff = (self - other).abs();
+
+        if diff <= epsilon {
+            true
+        } else {
+            let abs_self = self.abs();
+            let abs_other = other.abs();
+
+            let largest = Self::max(abs_self, abs_other);
+
+            diff < largest * max_relative
+        }
+    }
+}
+
+impl Real for f32 {
+    fn e() -> Self {
+        std::f32::consts::E
+    }
+
+    fn sqrt_2() -> Self {
+        std::f32::consts::SQRT_2
+    }
+
+    fn pi() -> Self {
+        std::f32::consts::PI
+    }
+
+    fn one_over_pi() -> Self {
+        std::f32::consts::FRAC_1_PI
+    }
+
+    fn two_over_pi() -> Self {
+        std::f32::consts::FRAC_2_PI
+    }
+
+    fn two_over_sqrt_pi() -> Self {
+        std::f32::consts::FRAC_2_SQRT_PI
+    }
+
+    fn one_over_sqrt_two() -> Self {
+        std::f32::consts::FRAC_1_SQRT_2
+    }
+
+    fn pi_over_2() -> Self {
+        std::f32::consts::FRAC_PI_2
+    }
+
+    fn pi_over_3() -> Self {
+        std::f32::consts::FRAC_PI_3
+    }
+
+    fn pi_over_4() -> Self {
+        std::f32::consts::FRAC_PI_4
+    }
+
+    fn pi_over_6() -> Self {
+        std::f32::consts::FRAC_PI_6
+    }
+
+    fn pi_over_8() -> Self {
+        std::f32::consts::FRAC_PI_8
+    }
+
+    fn ln_2() -> Self {
+        std::f32::consts::LN_2
+    }
+
+    fn ln_10() -> Self {
+        std::f32::consts::LN_10
+    }
+
+    fn log2_e() -> Self {
+        std::f32::consts::LOG2_E
+    }
+
+    fn log10_e() -> Self {
+        std::f32::consts::LOG10_E
+    }
+
+    fn from_scalar<T: Scalar>(t: T) -> Self {
+        t.to_f32()
+    }
+
+    // Adapted from the relative_eq method in the approx crate.
+    // https://docs.rs/approx/0.3.2/src/approx/relative_eq.rs.html#54-83
+    fn approx_eq(self, other: Self, epsilon: Self, max_relative: Self) -> bool {
+        // The special case in which both are *exactly* equal.
+        if self == other {
+            return true;
+        } else if self.is_infinite() || other.is_infinite() || self.is_nan() || other.is_nan() {
+            return false;
+        }
+
+        let diff = (self - other).abs();
+
+        if diff <= epsilon {
+            true
+        } else {
+            let abs_self = self.abs();
+            let abs_other = other.abs();
+
+            let largest = Self::max(abs_self, abs_other);
+
+            diff < largest * max_relative
+        }
+    }
+}
+
 real_impls! {
-    f32,
-    f64
+    f64,
+    f32
 }
 
 mod sealed {

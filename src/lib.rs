@@ -1,4 +1,5 @@
 #![allow(incomplete_features)]
+#![feature(box_syntax)]
 #![feature(const_generics)]
 #![feature(const_fn)]
 #![feature(const_loop)]
@@ -7,7 +8,6 @@
 #![feature(const_mut_refs)]
 #![feature(const_raw_ptr_deref)]
 #![feature(untagged_unions)]
-#![feature(const_raw_ptr_to_usize_cast)]
 #![feature(const_slice_from_raw_parts)]
 
 /// Constructs a matrix from a type, a value, or
@@ -66,7 +66,7 @@
 ///     1, 2, 3;
 ///     4, 5, 6;
 ///     7, 8, 9;
-/// ];
+/// ].into_real::<f64>();
 ///
 /// assert_eq!(m.det(), 0.0);
 /// ```
@@ -90,7 +90,7 @@ macro_rules! matrix {
 ///
 /// ## Vector from value
 ///
-/// An invocation in the form `matrix![x; N]` creates
+/// An invocation in the form `vector![x; N]` creates
 /// an N dimensional vector filled with the value `x`.
 ///
 /// ```
@@ -113,10 +113,9 @@ macro_rules! matrix {
 /// ```
 /// use const_linear::vector;
 ///
-/// let v = vector![1, 2, 3, 4];
+/// let v = vector![1, 2, 3, 4].into_real::<f64>();
 ///
 /// assert_eq!(v.length(), f64::sqrt(30.0));
-///
 /// ```
 #[macro_export]
 macro_rules! vector {
@@ -128,6 +127,7 @@ macro_rules! vector {
     };
 }
 
+pub mod algebra;
 pub mod core;
 pub mod geometry;
 pub mod traits;

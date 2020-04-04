@@ -1,13 +1,15 @@
 use crate::{traits::Scalar, utils::MaybeArray};
+use std::fmt;
 use std::mem::MaybeUninit;
 
+#[repr(transparent)]
 #[derive(Clone)]
 pub(crate) struct MatrixImpl<T: Scalar, const M: usize, const N: usize> {
     data: [[T; M]; N],
 }
 
-impl<T: Scalar, const R: usize, const C: usize> MatrixImpl<T, { R }, { C }> {
-    // Returns a matrix whose elements are all zero.
+impl<T: Scalar, const M: usize, const N: usize> MatrixImpl<T, { M }, { N }> {
+    /// Returns a matrix whose elements are all zero.
     pub(crate) const fn zero() -> Self {
         Self::from_val(T::ZERO)
     }
@@ -18,7 +20,7 @@ impl<T: Scalar, const R: usize, const C: usize> MatrixImpl<T, { R }, { C }> {
             let mut outer = MaybeArray::uninit();
             let mut outer_idx = 0;
 
-            while outer_idx < C {
+            while outer_idx < N {
                 let inner = MaybeArray::from_elem(t);
 
                 *outer.get_mut(outer_idx) = MaybeUninit::new(inner.assume_init());
@@ -31,7 +33,7 @@ impl<T: Scalar, const R: usize, const C: usize> MatrixImpl<T, { R }, { C }> {
         }
     }
 
-    pub(crate) const fn from_array(array: [[T; R]; C]) -> Self {
+    pub(crate) const fn from_array(array: [[T; M]; N]) -> Self {
         unsafe {
             Self {
                 data: MaybeArray::from_array(array).assume_init(),
@@ -39,11 +41,11 @@ impl<T: Scalar, const R: usize, const C: usize> MatrixImpl<T, { R }, { C }> {
         }
     }
 
-    pub(crate) const fn as_array(&self) -> &[[T; R]; C] {
+    pub(crate) const fn as_array(&self) -> &[[T; M]; N] {
         &self.data
     }
 
-    pub(crate) const fn as_mut_array(&mut self) -> &mut [[T; R]; C] {
+    pub(crate) const fn as_mut_array(&mut self) -> &mut [[T; M]; N] {
         &mut self.data
     }
 }
@@ -80,5 +82,13 @@ impl<T: Scalar, const N: usize> MatrixImpl<T, { N }, { N }> {
                 data: outer.assume_init(),
             }
         }
+    }
+}
+
+impl<T: Scalar, const M: usize, const N: usize> fmt::Debug for MatrixImpl<T, { M }, { N }> {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.debug_list()
+            .entries(self.data.iter().map(|arr| &arr[..]))
+            .finish()
     }
 }

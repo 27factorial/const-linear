@@ -1,5 +1,5 @@
-use crate::traits::Real;
-use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Sub, SubAssign};
+use crate::traits::{Real, Scalar};
+use std::ops::{Add, Div, Mul, Sub};
 
 #[derive(Copy, Clone, Debug)]
 pub enum Angle<T: Real> {
@@ -18,7 +18,7 @@ impl<T: Real> Angle<T> {
 
     pub fn to_rad(self) -> Self {
         match self {
-            Self::Deg(val) => Self::Rad(val * T::pi() / T::from_scalar(180)),
+            Self::Deg(val) => Self::Rad(val * T::pi() / 180.to_real()),
             Self::Rad(val) => Self::Rad(val),
         }
     }
@@ -26,7 +26,7 @@ impl<T: Real> Angle<T> {
     pub fn to_deg(self) -> Self {
         match self {
             Self::Deg(val) => Self::Deg(val),
-            Self::Rad(val) => Self::Deg(val * T::from_scalar(180) / T::pi()),
+            Self::Rad(val) => Self::Deg(val * 180.to_real() / T::pi()),
         }
     }
 
@@ -43,6 +43,41 @@ impl<T: Real> Angle<T> {
             Self::Deg(val) => *val,
             Self::Rad(val) => *val,
         }
+    }
+
+    pub fn scale(self, s: T) -> Self {
+        match self {
+            Self::Deg(val) => Self::Deg(val * s),
+            Self::Rad(val) => Self::Rad(val * s),
+        }
+    }
+
+    pub fn sin(self) -> T {
+        self.to_rad().val().sin()
+    }
+
+    pub fn cos(self) -> T {
+        self.to_rad().val().cos()
+    }
+
+    pub fn tan(self) -> T {
+        self.to_rad().val().tan()
+    }
+
+    pub fn asin(self) -> T {
+        self.to_rad().val().asin()
+    }
+
+    pub fn acos(self) -> T {
+        self.to_rad().val().acos()
+    }
+
+    pub fn atan(self) -> T {
+        self.to_rad().val().atan()
+    }
+
+    pub fn atan2(self, other: Self) -> T {
+        self.to_rad().val().atan2(other.to_rad().val())
     }
 }
 

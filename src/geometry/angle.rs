@@ -18,7 +18,7 @@ impl<T: Real> Angle<T> {
 
     pub fn to_rad(self) -> Self {
         match self {
-            Self::Deg(val) => Self::Rad(val * T::pi() / 180.to_real()),
+            Self::Deg(val) => Self::Rad(val * T::pi() / 180.into_real()),
             Self::Rad(val) => Self::Rad(val),
         }
     }
@@ -26,7 +26,7 @@ impl<T: Real> Angle<T> {
     pub fn to_deg(self) -> Self {
         match self {
             Self::Deg(val) => Self::Deg(val),
-            Self::Rad(val) => Self::Deg(val * 180.to_real() / T::pi()),
+            Self::Rad(val) => Self::Deg(val * 180.into_real() / T::pi()),
         }
     }
 

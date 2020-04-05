@@ -59,7 +59,7 @@ impl<T: Real> Quaternion<T> {
     /// assert_eq!(q, Quaternion::new(scalar, vector))
     /// ```
     pub fn from_axis_angle(axis: Vector<T, 3>, angle: Angle<T>) -> Self {
-        let angle = angle.to_rad().scale(2.to_real::<T>().recip());
+        let angle = angle.to_rad().scale(2.into_real::<T>().recip());
 
         let scalar = angle.cos();
         let vector = axis.normalize().scale(angle.sin());
